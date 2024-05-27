@@ -8,6 +8,7 @@ import com.carservicepro.vehicle.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -27,6 +28,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @Transactional
     public ResponseEntity<Void> deleteVehicleById(@PathVariable Integer id) {
         vehicleService.deleteVehicleById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -41,8 +43,8 @@ public class VehicleController {
     public ResponseEntity<List<VehicleResponseDTO>> getAll() {
         return ResponseEntity.ok(vehicleService.findAll());
     }
-    @GetMapping("/id")
-    public ResponseEntity<List <VehicleResponseDTO>> getById(@RequestParam("id") Integer id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<List <VehicleResponseDTO>> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(vehicleService.findById(id));
     }
 

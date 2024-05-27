@@ -17,6 +17,8 @@ public class UserController {
 
     private final UserService userService;
 
+
+
     @PostMapping
     public ResponseEntity<Void> saveUser(@RequestBody UserRequestDTO userRequestDTO) {
         userService.saveUser(userRequestDTO);
@@ -30,8 +32,13 @@ public class UserController {
     }
 
     @GetMapping("/email")
-    public ResponseEntity<UserResponseDTO> getByUsername(@RequestParam("email") String email, @RequestParam("password") String password) {
-        return ResponseEntity.ok(userService.findByUserEmail(email, password));
+    public ResponseEntity<UserResponseDTO> getByUsername(@RequestParam("email") String email) {
+        return ResponseEntity.ok(userService.findByUserEmail(email));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>> getAll() {
+        return ResponseEntity.ok(userService.findAll());
     }
 
 

@@ -1,10 +1,12 @@
 package com.carservicepro.vehicle.service.impl;
 
 import com.carservicepro.exceptionhandler.customexception.VehicleNotFoundException;
+import com.carservicepro.user.entity.User;
+import com.carservicepro.user.repository.UserRepository;
 import com.carservicepro.vehicle.dto.VehicleRequestDTO;
 import com.carservicepro.vehicle.dto.VehicleResponseDTO;
 import com.carservicepro.vehicle.entity.Vehicle;
-import com.carservicepro.vehicle.mapper.VehicleMapper;
+import com.carservicepro.vehicle.mapper.UtilsVehicle;
 import com.carservicepro.vehicle.repository.VehicleRepository;
 import com.carservicepro.vehicle.service.VehicleService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -19,13 +22,22 @@ import java.util.List;
 public class VehicleServiceImpl implements VehicleService {
 
     private final VehicleRepository vehicleRepository;
-    private final VehicleMapper modelMapper;
+    private final UtilsVehicle utilsVehicle;
+    private final UserRepository userRepository;
 
     @Override
-    public void saveVehicle(VehicleRequestDTO vehicleRequestDTO) {
-        Vehicle vehicle = modelMapper.asVehicle(vehicleRequestDTO);
-        log.info("save vehicle: {}", vehicle.getId());
-        vehicleRepository.save(vehicle);
+    public void saveVehicle( VehicleRequestDTO vehicleRequestDTO){
+        if(vehicleRequestDTO ==null){
+            return;
+        }
+        Optional <User> user = userRepository.findById(vehicleRequestDTO.getUserId());
+        if(user.isPresent()){
+            User existingUser= user.get();
+            Vehicle vehicle = utilsVehicle.asVehicle(vehicleRequestDTO);
+            vehicle.setUser(existingUser);
+            existingUser.getVehicles().add(vehicle);
+            userRepository.saveAndFlush(existingUser);
+        }
     }
 
     @Override
@@ -40,7 +52,7 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle response = vehicleRepository.findById(vehicleRequestDTO.getId()).orElseThrow(
                 () -> new VehicleNotFoundException(String.format("Vehicle not found by code : %s", vehicleRequestDTO.getId())));
 
-        Vehicle vehicle = modelMapper.asUpdateVehicle(response,vehicleRequestDTO);
+        Vehicle vehicle = utilsVehicle.asUpdateVehicle(response,vehicleRequestDTO);
         log.info("update response by code: {}", vehicle.getId());
         vehicleRepository.save(vehicle);
 
@@ -48,7 +60,7 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<VehicleResponseDTO> findAll() {
-        return modelMapper.asVehicleResponseList(vehicleRepository.findAll());
+        return utilsVehicle.asVehicleResponseList(vehicleRepository.findAll());
 
     }
 
@@ -56,6 +68,6 @@ public class VehicleServiceImpl implements VehicleService {
     public List<VehicleResponseDTO> findById(Integer id) {
         List<Vehicle> models = vehicleRepository.findVehicleById(id);
 
-        return modelMapper.asVehicleResponseList(models);
+        return utilsVehicle.asVehicleResponseList(models);
     }
 }

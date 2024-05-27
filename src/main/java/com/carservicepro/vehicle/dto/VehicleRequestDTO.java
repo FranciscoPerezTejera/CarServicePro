@@ -21,4 +21,7 @@ public class VehicleRequestDTO {
     private double price;
 
     private String imageModel;
+
+    private Integer userId;
+
 }

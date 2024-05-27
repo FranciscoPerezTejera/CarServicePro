@@ -19,17 +19,16 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
 
-    /*VehicleMapper VEHICLE_MAPPER = Mappers.getMapper(VehicleMapper.class);*/
+    VehicleMapper VEHICLE_MAPPER = Mappers.getMapper(VehicleMapper.class);
 
     UserResponseDTO asUserResponse(User user);
 
-    /*default User asUser(UserRequestDTO userRequestDTO, String password) {
+    default User asUser(UserRequestDTO userRequestDTO, String password) {
         if (userRequestDTO == null) {
             return null;
         }
 
         User user = new User();
-        user.setId(userRequestDTO.getId());
         user.setEmail(userRequestDTO.getEmail());
         user.setPassword(password);
 
@@ -63,6 +62,6 @@ public interface UserMapper {
         }
 
         return user;
-    }*/
+    }
 }
 
